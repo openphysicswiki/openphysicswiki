@@ -1,0 +1,16 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Page not found">
+  <section class="not-found">
+    <p class="eyebrow">404 · Unresolved reference</p>
+    <h1>This result is not in the graph.</h1>
+    <p class="lede">The page may have moved, or the reference may be broken.</p>
+    <div><a class="button button-primary" href="/">Choose a field</a><a class="button" href="/contribute/">Report a broken reference</a></div>
+  </section>
+</BaseLayout>
+<style>
+  .not-found { max-width: 48rem; padding: 6rem 0; }
+  h1 { font-family: var(--font-serif); font-weight: 550; }
+  div { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2rem; }
+</style>

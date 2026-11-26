@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import DependencyGraph from "../../components/DependencyGraph.astro";
+import GraphLegend from "../../components/GraphLegend.astro";
+import TypeBadge from "../../components/TypeBadge.astro";
+import { FIELDS } from "../../data/fields";
+import { getEntries, toGraphEntry, entryUrl, type Entry } from "../../lib/entries";
+import { DependencyGraph as MechanicsGraph } from "../../lib/graph";
+
+export async function getStaticPaths() {
+  const entries = await getEntries();
+  return FIELDS.map((field) => ({
+    params: { field: field.slug },
+    props: { field, entries },
+  }));
+}
+
+interface Props {
+  field: (typeof FIELDS)[number];
+  entries: Entry[];
+}
+const { field, entries } = Astro.props;
+const fieldEntries = entries.filter((entry) => entry.data.field === field.slug);
+const graph = new MechanicsGraph(entries.map(toGraphEntry));
+const visible = new Set(fieldEntries.map((entry) => entry.data.slug));
+const foundationalCount = fieldEntries.filter((entry) => entry.data.foundational).length;
+---
+<BaseLayout title={field.name} description={field.description} wide>
+  <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: field.name }]} />
+  {field.available ? (
+    <>
+      <header class="field-header">
+        <div>
+          <p class="eyebrow">Field map</p>
+          <h1>{field.name}</h1>
+          <p class="lede">{field.description}</p>
+        </div>
+        <dl class="field-stats">
+          <div><dt>Entries</dt><dd>{fieldEntries.length}</dd></div>
+          <div><dt>Foundational</dt><dd>{foundationalCount}</dd></div>
+        </dl>
+      </header>
+
+      <section class="map-section" aria-labelledby="map-heading">
+        <div class="map-heading-row">
+          <div>
+            <h2 id="map-heading">Dependency map</h2>
+            <p>Follow any result back to its foundations—or forward to what it unlocks.</p>
+          </div>
+          <GraphLegend />
+        </div>
+        <DependencyGraph graph={graph} visible={visible} label={`${field.name} dependency graph`} />
+      </section>
+
+      {fieldEntries.length > 0 && (
+        <section class="entry-index" aria-labelledby="index-heading">
+          <div class="index-heading-row">
+            <h2 id="index-heading">All entries</h2>
+            <span>Alphabetical · dependencies shown on each page</span>
+          </div>
+          <ol class="entry-list">
+            {fieldEntries.map((entry, index) => (
+              <li>
+                <span class="entry-number">{String(index + 1).padStart(2, "0")}</span>
+                <a href={entryUrl(entry)}>
+                  <span class="entry-list-title">{entry.data.title}</span>
+                  <span class="entry-list-summary">{entry.data.summary}</span>
+                </a>
+                <TypeBadge type={entry.data.type} />
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </>
+  ) : (
+    <section class="under-construction">
+      <p class="eyebrow">Field status</p>
+      <h1>{field.name}</h1>
+      <div class="construction-symbol" aria-hidden="true">∴</div>
+      <h2>Under construction</h2>
+      <p class="lede">This field has no published entries yet. The first milestone is building classical mechanics from Newton's laws to the Lagrangian conservation laws.</p>
+      <div class="construction-actions">
+        <a class="button button-primary" href="/classical-mechanics/">Explore classical mechanics</a>
+        <a class="button" href="/contribute/">How to contribute</a>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .field-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; padding: 2.5rem 0 3.5rem; }
+  .field-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
+  .field-header .lede { margin-bottom: 0; }
+  .field-stats { display: flex; gap: 2rem; margin: 0; }
+  .field-stats div { min-width: 5rem; }
+  .field-stats dt { color: var(--muted); font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .field-stats dd { margin: 0.15rem 0 0; font-family: var(--font-serif); font-size: 2rem; line-height: 1; }
+  .map-section { min-width: 0; }
+  .map-heading-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+  .map-heading-row h2 { margin: 0 0 0.35rem; font-size: 1.15rem; }
+  .map-heading-row p { margin: 0; color: var(--muted); font-size: 0.8rem; }
+  .map-heading-row :global(.graph-legend) { max-width: 38rem; justify-content: flex-end; }
+  .entry-index { margin-top: 4rem; }
+  .index-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--text); }
+  .index-heading-row h2 { margin: 0; font-size: 1.1rem; }
+  .index-heading-row span { color: var(--muted); font-size: 0.7rem; }
+  .entry-list { list-style: none; margin: 0; padding: 0; }
+  .entry-list li { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+  .entry-number { color: var(--faint); font-family: var(--font-mono); font-size: 0.68rem; }
+  .entry-list li > a { display: grid; grid-template-columns: minmax(12rem, 0.75fr) minmax(0, 1fr); align-items: center; gap: 1.5rem; color: var(--text); text-decoration: none; }
+  .entry-list li > a:hover .entry-list-title { color: var(--accent); }
+  .entry-list-title { font-size: 0.9rem; font-weight: 620; }
+  .entry-list-summary { color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
+  .under-construction { max-width: 46rem; padding: 4rem 0; }
+  .construction-symbol { margin: 3rem 0 1rem; color: var(--accent); font-family: var(--font-serif); font-size: 4rem; }
+  .under-construction h2 { margin-bottom: 0.7rem; }
+  .construction-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2rem; }
+  @media (max-width: 850px) {
+    .map-heading-row { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .map-heading-row :global(.graph-legend) { justify-content: flex-start; }
+    .entry-list li > a { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+  @media (max-width: 620px) {
+    .field-header { align-items: flex-start; flex-direction: column; padding-top: 1.5rem; }
+    .field-stats { gap: 1.5rem; }
+    .entry-list li { grid-template-columns: 1.8rem minmax(0, 1fr); }
+    .entry-list li > :global(.type-badge) { grid-column: 2; margin-top: -0.25rem; }
+    .index-heading-row span { display: none; }
+  }
+</style>

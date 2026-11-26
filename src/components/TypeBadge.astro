@@ -1,0 +1,41 @@
+---
+import { getEntryType } from "../data/site";
+interface Props {
+  type: string;
+  showCode?: boolean;
+}
+const { type, showCode = false } = Astro.props;
+const entryType = getEntryType(type);
+---
+<span class:list={["type-badge", `type-${entryType.id}`]}>
+  {showCode && <span class="type-code" aria-hidden="true">{entryType.code}</span>}
+  {entryType.label}
+</span>
+
+<style>
+  .type-badge {
+    --badge: var(--text);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    border: 1px solid color-mix(in srgb, var(--badge) 45%, transparent);
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+    color: var(--badge);
+    background: color-mix(in srgb, var(--badge) 8%, transparent);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .type-code { font-family: var(--font-mono); }
+  .type-definition { --badge: var(--type-definition); }
+  .type-axiom { --badge: var(--type-axiom); }
+  .type-principle { --badge: var(--type-principle); }
+  .type-theorem { --badge: var(--type-theorem); }
+  .type-technique { --badge: var(--type-technique); }
+  .type-example { --badge: var(--type-example); }
+</style>

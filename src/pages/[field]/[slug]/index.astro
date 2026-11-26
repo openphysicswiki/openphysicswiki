@@ -1,0 +1,84 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import DependencyGraph from "../../../components/DependencyGraph.astro";
+import TypeBadge from "../../../components/TypeBadge.astro";
+import { getField } from "../../../data/fields";
+import { getEntries, toGraphEntry, type Entry } from "../../../lib/entries";
+import { DependencyGraph as GraphModel } from "../../../lib/graph";
+
+export async function getStaticPaths() {
+  const entries = await getEntries();
+  return entries.map((entry) => ({
+    params: { field: entry.data.field, slug: entry.data.slug },
+    props: { entry, entries },
+  }));
+}
+
+interface Props { entry: Entry; entries: Entry[] }
+const { entry, entries } = Astro.props;
+const { Content } = await render(entry);
+const field = getField(entry.data.field)!;
+const graph = new GraphModel(entries.map(toGraphEntry));
+const visible = graph.neighborhood(entry.data.slug);
+const ancestors = graph.ancestors(entry.data.slug);
+const descendants = graph.descendants(entry.data.slug);
+---
+<BaseLayout title={entry.data.title} description={entry.data.summary} wide>
+  <article class="entry">
+    <Breadcrumbs items={[
+      { label: "Home", href: "/" },
+      { label: field.name, href: `/${field.slug}/` },
+      { label: entry.data.title },
+    ]} />
+    <header class="entry-header">
+      <div class="entry-labels">
+        <TypeBadge type={entry.data.type} />
+        {entry.data.foundational && <span class="foundational-badge"><span aria-hidden="true">◆</span> Foundational</span>}
+      </div>
+      <h1>{entry.data.title}</h1>
+      <p class="lede">{entry.data.summary}</p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <section class="entry-map" aria-labelledby="entry-map-heading">
+    <div class="entry-map-heading">
+      <div>
+        <p class="eyebrow">Logical context</p>
+        <h2 id="entry-map-heading">Dependency map</h2>
+      </div>
+      <p class="map-summary">
+        {ancestors.size} {ancestors.size === 1 ? "prerequisite" : "prerequisites"}
+        <span aria-hidden="true"> · </span>
+        {descendants.size} {descendants.size === 1 ? "dependent" : "dependents"}
+      </p>
+    </div>
+    <DependencyGraph graph={graph} visible={visible} label={`Dependencies and dependents of ${entry.data.title}`} compact />
+  </section>
+
+  <p class="entry-edit">Found a mistake? <a href="/contribute/">Propose a patch <span aria-hidden="true">↗</span></a></p>
+</BaseLayout>
+
+<style>
+  .entry-header { padding: 1.2rem 0 1.5rem; }
+  .entry-labels { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; }
+  .foundational-badge { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--accent); font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+  .foundational-badge span { font-size: 0.6rem; }
+  .entry-header h1 { font-family: var(--font-serif); font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 550; letter-spacing: -0.045em; }
+  .entry-header .lede { margin: 0; font-size: 0.96rem; }
+  .entry :global(.prose) { padding-bottom: 1.5rem; }
+  .entry-map { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .entry-map-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1rem; }
+  .entry-map-heading .eyebrow { margin-bottom: 0.4rem; }
+  .entry-map-heading h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.02em; }
+  .map-summary { flex: none; margin: 0 0 0.15rem; color: var(--muted); font-family: var(--font-mono); font-size: 0.68rem; }
+  .entry-edit { margin-top: 1.5rem; color: var(--muted); font-size: 0.75rem; }
+  .entry-edit a { margin-left: 0.25rem; }
+  @media (max-width: 650px) {
+    .entry-map-heading { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
+  }
+</style>

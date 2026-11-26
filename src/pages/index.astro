@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { FIELDS } from "../data/fields";
+import { getEntries } from "../lib/entries";
+
+const entries = await getEntries();
+---
+<BaseLayout>
+  <section class="field-choice" aria-labelledby="field-heading">
+    <h1 id="field-heading" class="sr-only">Choose a field of physics</h1>
+    <div class="field-grid">
+      {FIELDS.map((field) => {
+        const count = entries.filter((entry) => entry.data.field === field.slug).length;
+        return (
+          <a class:list={["field-card", { available: field.available }]} href={`/${field.slug}/`}>
+            <span class="field-status">{field.available ? `${count} entries` : "Under construction"}</span>
+            <strong>{field.name}</strong>
+            <span class="field-description">{field.description}</span>
+            <span class="field-arrow" aria-hidden="true">↗</span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .field-choice { padding-top: clamp(1.5rem, 5vw, 3.5rem); }
+  .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+  .field-card { position: relative; display: grid; grid-template-columns: 1fr auto; min-height: 11.5rem; padding: 1.35rem; border: 1px solid var(--line); border-radius: 0.55rem; background: var(--surface); color: var(--text); text-decoration: none; transition: border-color 130ms, transform 130ms; }
+  .field-card:hover { border-color: var(--faint); color: var(--text); transform: translateY(-2px); }
+  .field-card.available { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .field-card.available:hover { border-color: var(--accent); }
+  .field-status { grid-column: 1 / -1; justify-self: end; color: var(--muted); font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .available .field-status { color: var(--accent); }
+  .field-card strong { align-self: end; grid-column: 1 / -1; margin-top: 1.8rem; font-size: 1.15rem; font-weight: 630; letter-spacing: -0.025em; }
+  .field-description { grid-column: 1 / -1; max-width: 34rem; margin-top: 0.35rem; color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
+  .field-arrow { position: absolute; right: 1.25rem; bottom: 1.15rem; color: var(--faint); opacity: 0; }
+  .field-card:hover .field-arrow { opacity: 1; }
+  @media (max-width: 650px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field-card { min-height: 10rem; }
+  }
+</style>

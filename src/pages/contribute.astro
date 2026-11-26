@@ -1,0 +1,73 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import { SITE } from "../data/site";
+---
+<BaseLayout title="Contribute" description="Add or repair an openphysics.wiki entry.">
+  <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Contribute" }]} />
+  <article class="contribute-page">
+    <p class="eyebrow">Patch the reference</p>
+    <h1>Make one result better.</h1>
+    <p class="lede">Fix a sign, tighten an assumption, repair a reference, or add one atomic result. Small, reviewable changes are ideal.</p>
+
+    <section>
+      <h2>1. Choose one atomic result</h2>
+      <p>Each file contains exactly one definition, axiom, principle, theorem, technique, or example. State its assumptions. Include a short derivation where relevant.</p>
+      <p>Write everything from scratch. External sources can cross-check a result, never supply its wording, derivation, or problems.</p>
+    </section>
+
+    <section>
+      <h2>2. Create the entry</h2>
+      <p>Add a Markdown file under <code>src/content/entries/&lt;field&gt;/</code>. The filename must match the slug. Dependencies are direct prerequisites only; the transitive graph is computed for you.</p>
+      <pre><code>---
+title: "Work–energy theorem"
+slug: work-energy-theorem
+type: theorem
+field: classical-mechanics
+foundational: false
+dependencies: [work, kinetic-energy, newtons-second-law]
+summary: "The net work on a particle equals its change in kinetic energy."
+---
+## Statement
+...
+## Assumptions
+...
+## Derivation
+...</code></pre>
+      <p>Use <code>dependencies: []</code> for a true starting point. Definitions and axioms are marked <code>foundational: true</code>. Empty collections are valid; isolated entries are not.</p>
+    </section>
+
+    <section>
+      <h2>3. Run the checks locally</h2>
+      <pre><code>npm ci
+npm run check
+npm test
+npm run build</code></pre>
+      <p>The content checker resolves every reference, detects cycles and orphan entries, and validates the schema and required sections. The same checks run on every pull request.</p>
+    </section>
+
+    <section>
+      <h2>4. Open a pull request</h2>
+      <p>Explain the physical change and list any sources used only to cross-check it. Keep unrelated edits out of the patch. The <strong>Validate</strong> status check must pass before merge.</p>
+      {SITE.repositoryUrl ? <a class="button button-primary" href={SITE.repositoryUrl}>Open the source repository ↗</a> : <p class="repo-note">The public repository URL is injected at build time with <code>PUBLIC_REPOSITORY_URL</code>.</p>}
+    </section>
+
+    <aside>
+      <strong>By contributing, you agree to license your content under CC BY-SA 4.0 and code under MIT.</strong>
+      <a href="/license/">Read the licensing summary</a>
+    </aside>
+  </article>
+</BaseLayout>
+
+<style>
+  .contribute-page { max-width: 47rem; padding-top: 1.5rem; }
+  h1 { font-family: var(--font-serif); font-weight: 550; }
+  section { margin-top: 2.7rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  section h2 { font-size: 1.1rem; }
+  section p { color: var(--muted); font-size: 0.87rem; line-height: 1.7; }
+  code { padding: 0.1em 0.25em; border-radius: 0.2rem; background: var(--surface-subtle); font-family: var(--font-mono); font-size: 0.84em; }
+  pre { overflow-x: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 0.45rem; background: var(--surface); font-size: 0.75rem; line-height: 1.6; }
+  pre code { padding: 0; background: transparent; }
+  aside { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 3rem; padding: 1rem; border-left: 3px solid var(--accent); background: var(--surface-subtle); font-size: 0.75rem; }
+  .repo-note { font-size: 0.75rem !important; }
+</style>

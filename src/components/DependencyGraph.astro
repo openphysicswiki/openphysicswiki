@@ -1,0 +1,183 @@
+---
+import { DependencyGraph } from "../lib/graph";
+import { layoutGraph, wrapTitle } from "../lib/graph-layout";
+import { entryUrl } from "../lib/entries";
+import { getEntryType } from "../data/site";
+
+interface Props {
+  graph: DependencyGraph;
+  visible: Set<string>;
+  label: string;
+  compact?: boolean;
+}
+const { graph, visible, label, compact = false } = Astro.props;
+const layout = layoutGraph(graph, visible, compact);
+const data = {
+  dependencies: Object.fromEntries(layout.nodes.map((node) => [node.slug, node.dependencies.filter((id) => visible.has(id))])),
+  dependents: Object.fromEntries(layout.nodes.map((node) => [node.slug, [...(graph.dependents.get(node.slug) ?? [])].filter((id) => visible.has(id))])),
+};
+const graphId = `graph-${crypto.randomUUID()}`;
+---
+{layout.nodes.length === 0 ? (
+  <div class="empty-graph">
+    <p>No entries yet.</p>
+    <span>The dependency graph will appear when the first entry is added.</span>
+  </div>
+) : (
+  <div class:list={["dependency-graph", { compact }]} data-dependency-graph>
+    <div class="graph-toolbar">
+      <p id={`${graphId}-help`}>Prerequisites → results. Scroll sideways; hover or focus a node to trace its chain.</p>
+      <button type="button" class="graph-reset" hidden>Clear highlight</button>
+    </div>
+    <div class="graph-scroll" tabindex="0" role="region" aria-label={`${label}. Scroll horizontally for the full map.`}>
+      <svg
+        class="graph-svg"
+        viewBox={`0 0 ${layout.width} ${layout.height}`}
+        style={`min-width: ${layout.width}px`}
+        role="group"
+        aria-label={label}
+        aria-describedby={`${graphId}-help`}
+      >
+        <defs>
+          <marker id={`${graphId}-arrow`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head" />
+          </marker>
+        </defs>
+        <g class="graph-edges" aria-hidden="true">
+          {layout.edges.map((edge) => (
+            <path
+              class="graph-edge"
+              data-source={edge.source}
+              data-target={edge.target}
+              d={edge.path}
+              marker-end={`url(#${graphId}-arrow)`}
+            />
+          ))}
+        </g>
+        <g class="graph-nodes">
+          {layout.nodes.map((node) => {
+            const type = getEntryType(node.type);
+            const lines = wrapTitle(node.title, compact ? 22 : 25);
+            const titleY = lines.length === 1 ? 5 : lines.length === 2 ? -1 : -7;
+            return (
+              <g transform={`translate(${node.x - node.width / 2} ${node.y - node.height / 2})`}>
+              <a
+                href={entryUrl(node)}
+                class:list={["graph-node", `type-${node.type}`]}
+                data-node={node.slug}
+                aria-label={`${node.title}, ${type.label}${node.foundational ? ", foundational" : ""}`}
+              >
+                <title>{node.title} — {type.label}</title>
+                {node.type === "theorem" ? <rect class="node-shape" width={node.width} height={node.height} rx="39" /> :
+                  node.type === "axiom" ? <path class="node-shape" d={`M18 0H${node.width - 18}L${node.width} 18V${node.height - 18}L${node.width - 18} ${node.height}H18L0 ${node.height - 18}V18Z`} /> :
+                  node.type === "principle" ? <path class="node-shape" d={`M24 0H${node.width - 24}L${node.width} ${node.height / 2}L${node.width - 24} ${node.height}H24L0 ${node.height / 2}Z`} /> :
+                  node.type === "technique" ? <rect class="node-shape dashed" width={node.width} height={node.height} rx="4" /> :
+                  node.type === "example" ? <path class="node-shape" d={`M14 0H${node.width - 14}L${node.width} 14V${node.height - 14}L${node.width - 14} ${node.height}H14L0 ${node.height - 14}V14Z`} /> :
+                  <rect class="node-shape" width={node.width} height={node.height} rx="3" />}
+                <text class="node-code" x="14" y="18" aria-hidden="true">{type.code}</text>
+                {node.foundational && <text class="foundation-mark" x={node.width - 15} y="18" text-anchor="end" aria-hidden="true">◆</text>}
+                <text class="node-title" x={node.width / 2} y={node.height / 2 + titleY} text-anchor="middle" aria-hidden="true">
+                  {lines.map((line, index) => <tspan x={node.width / 2} dy={index === 0 ? 0 : (compact ? 13 : 15)}>{line}</tspan>)}
+                </text>
+              </a>
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+    </div>
+    <script type="application/json" class="graph-data" set:html={JSON.stringify(data)} />
+  </div>
+)}
+
+<script>
+  type GraphData = { dependencies: Record<string, string[]>; dependents: Record<string, string[]> };
+
+  document.querySelectorAll<HTMLElement>("[data-dependency-graph]").forEach((container) => {
+    const dataElement = container.querySelector<HTMLElement>(".graph-data");
+    const reset = container.querySelector<HTMLButtonElement>(".graph-reset");
+    if (!dataElement) return;
+    const data = JSON.parse(dataElement.textContent ?? "{}") as GraphData;
+    const nodes = [...container.querySelectorAll<SVGAElement>("[data-node]")];
+    const edges = [...container.querySelectorAll<SVGPathElement>(".graph-edge")];
+    if (reset) reset.hidden = false;
+
+    const walk = (start: string, direction: keyof GraphData) => {
+      const found = new Set<string>();
+      const pending = [...(data[direction][start] ?? [])];
+      while (pending.length) {
+        const slug = pending.pop()!;
+        if (found.has(slug)) continue;
+        found.add(slug);
+        pending.push(...(data[direction][slug] ?? []));
+      }
+      return found;
+    };
+
+    const clear = () => {
+      container.classList.remove("has-highlight");
+      nodes.forEach((node) => node.classList.remove("is-active", "is-origin"));
+      edges.forEach((edge) => edge.classList.remove("is-active"));
+    };
+
+    const highlight = (slug: string) => {
+      const active = new Set([slug, ...walk(slug, "dependencies"), ...walk(slug, "dependents")]);
+      container.classList.add("has-highlight");
+      nodes.forEach((node) => {
+        const id = node.dataset.node!;
+        node.classList.toggle("is-active", active.has(id));
+        node.classList.toggle("is-origin", id === slug);
+      });
+      edges.forEach((edge) => {
+        edge.classList.toggle("is-active", active.has(edge.dataset.source!) && active.has(edge.dataset.target!));
+      });
+    };
+
+    nodes.forEach((node) => {
+      node.addEventListener("mouseenter", () => highlight(node.dataset.node!));
+      node.addEventListener("focus", () => highlight(node.dataset.node!));
+    });
+    container.addEventListener("mouseleave", clear);
+    container.addEventListener("focusout", (event) => {
+      if (!container.contains(event.relatedTarget as Node | null)) clear();
+    });
+    reset?.addEventListener("click", clear);
+  });
+</script>
+
+<style>
+  .dependency-graph { min-width: 0; }
+  .graph-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+  .graph-toolbar p { margin: 0; color: var(--muted); font-size: 0.75rem; }
+  .graph-reset { flex: none; border: 0; padding: 0.25rem; background: transparent; color: var(--accent); cursor: pointer; font: inherit; font-size: 0.72rem; }
+  .graph-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 0.65rem; background: var(--surface); background-image: radial-gradient(color-mix(in srgb, var(--line) 75%, transparent) 0.7px, transparent 0.7px); background-size: 16px 16px; }
+  .graph-scroll:focus-visible { outline-offset: 2px; }
+  .graph-svg { display: block; width: 100%; height: auto; }
+  .graph-edge { fill: none; stroke: var(--faint); stroke-width: 1.25; opacity: 0.55; transition: opacity 120ms, stroke 120ms; }
+  .arrow-head { fill: var(--faint); }
+  .graph-node { --node: var(--text); color: var(--text); cursor: pointer; outline: none; }
+  .node-shape { fill: color-mix(in srgb, var(--node) 7%, var(--surface)); stroke: var(--node); stroke-width: 1.6; transition: opacity 120ms, fill 120ms, stroke-width 120ms; }
+  .node-shape.dashed { stroke-dasharray: 6 3; }
+  .node-title { fill: var(--text); font-family: var(--font-sans); font-size: 12.5px; font-weight: 610; pointer-events: none; }
+  .node-code { fill: var(--node); font-family: var(--font-mono); font-size: 10px; font-weight: 800; }
+  .foundation-mark { fill: var(--accent); font-size: 8px; }
+  .type-definition { --node: var(--type-definition); }
+  .type-axiom { --node: var(--type-axiom); }
+  .type-principle { --node: var(--type-principle); }
+  .type-theorem { --node: var(--type-theorem); }
+  .type-technique { --node: var(--type-technique); }
+  .type-example { --node: var(--type-example); }
+  .graph-node:hover .node-shape, .graph-node:focus .node-shape, .graph-node.is-origin .node-shape { fill: color-mix(in srgb, var(--node) 17%, var(--surface)); stroke-width: 3; }
+  .has-highlight .graph-node:not(.is-active), .has-highlight .graph-edge:not(.is-active) { opacity: 0.16; }
+  .graph-edge.is-active { stroke: var(--accent); stroke-width: 2.2; opacity: 0.95; }
+  .empty-graph { display: grid; place-content: center; min-height: 15rem; padding: 2rem; border: 1px dashed var(--line); border-radius: 0.65rem; text-align: center; }
+  .empty-graph p { margin: 0; font-weight: 650; }
+  .empty-graph span { color: var(--muted); font-size: 0.85rem; }
+  .compact .graph-toolbar { margin-bottom: 0.5rem; }
+  .compact .node-title { font-size: 11px; }
+  .compact .node-code { font-size: 9px; }
+  @media (max-width: 620px) {
+    .graph-toolbar { align-items: flex-start; }
+    .graph-toolbar p { max-width: 42ch; }
+  }
+</style>

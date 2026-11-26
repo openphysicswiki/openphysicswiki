@@ -1,0 +1,58 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+---
+<BaseLayout title="About" description="Why openphysics.wiki exists and how it works.">
+  <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About" }]} />
+  <article class="static-page">
+    <p class="eyebrow">The project</p>
+    <h1>A reference, not another textbook.</h1>
+    <p class="lede">openphysics.wiki is a free, open-source, crowd-maintained source of linked physics results. It will never be monetised.</p>
+
+    <section>
+      <h2>Find one fact. See exactly what it needs.</h2>
+      <p>A result should not require searching through a textbook, an encyclopedia, and a question board. Each page states one result, makes its assumptions explicit, and links directly to what it uses.</p>
+      <p>The dependency graph is derived from those links during the build. Nobody maintains a separate graph by hand.</p>
+    </section>
+
+    <section>
+      <h2>Mathematics first</h2>
+      <p>Entries use as little exposition as possible. Definitions, axioms, principles, theorems, techniques, and examples have distinct types. Derivations are short and foundational assumptions remain visible.</p>
+    </section>
+
+    <section>
+      <h2>Patch mistakes like software</h2>
+      <p>All content is written from scratch. Textbooks and other references may cross-check a result, but their prose, derivations, and problems are never copied.</p>
+      <p>Every proposed change passes structural validation: references must resolve, the graph must be acyclic, entries cannot be isolated, and the entry format must be valid.</p>
+    </section>
+
+    <section>
+      <h2>Verification roadmap</h2>
+      <ol class="roadmap">
+        <li><span>Now</span><div><strong>Structure</strong><p>Entry schema, references, cycles, and orphan detection.</p></div></li>
+        <li><span>Next</span><div><strong>Physical consistency</strong><p>Units, dimensions, and symbolic derivation checks with tools such as SymPy.</p></div></li>
+        <li><span>Later</span><div><strong>Selected formal proofs</strong><p>Machine-checked proofs of selected results, potentially in Lean.</p></div></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Open means open</h2>
+      <p>Code is available under MIT. Content is available under CC BY-SA 4.0. There is no advertising, tracking, paywall, or plan to monetise the reference.</p>
+      <div class="about-actions"><a class="button button-primary" href="/classical-mechanics/">Start with classical mechanics</a><a class="button" href="/contribute/">Contribute</a></div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .static-page { max-width: 47rem; padding-top: 1.5rem; }
+  .static-page h1 { max-width: 12ch; font-family: var(--font-serif); font-weight: 550; }
+  .static-page section { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .static-page section h2 { font-size: 1.2rem; }
+  .static-page section p { color: var(--muted); font-size: 0.9rem; line-height: 1.75; }
+  .roadmap { list-style: none; padding: 0; }
+  .roadmap li { display: grid; grid-template-columns: 4rem 1fr; gap: 1rem; padding: 0.8rem 0; }
+  .roadmap li > span { color: var(--accent); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; }
+  .roadmap strong { font-size: 0.88rem; }
+  .roadmap p { margin: 0.2rem 0 0 !important; }
+  .about-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.5rem; }
+</style>
