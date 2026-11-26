@@ -92,13 +92,14 @@ Search uses Pagefind's accessible modal component and a static browser-side inde
 
 ## Deployment
 
-The hosting provider is intentionally not coupled to the build.
-
-**Cloudflare Pages**
+The site is entirely prerendered. **Cloudflare Workers static assets** are configured explicitly in `wrangler.jsonc`: Wrangler uploads `dist/`—the same directory generated and indexed by Astro—and no Worker script or Astro adapter is used. This prevents Wrangler's automatic framework setup from moving assets to `dist/client` during deployment.
 
 - Build command: `npm run build`
-- Output directory: `dist`
+- Deploy command: `npx wrangler deploy` (or `npm run deploy`)
+- Assets directory: `dist`
 - Node version: `24`
+
+Cloudflare Pages and GitHub Pages can also publish the same `dist/` output without changes.
 
 **GitHub Pages**
 
