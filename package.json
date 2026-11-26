@@ -6,7 +6,7 @@
   "description": "A free, open-source, dependency-linked physics reference.",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run check:content && astro build && tsx scripts/index-search.ts",
+    "build": "npm run check:content && astro build",
     "search:serve": "pagefind --serve",
     "preview": "astro preview",
     "check": "npm run check:content && astro check",

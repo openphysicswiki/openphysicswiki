@@ -23,7 +23,8 @@ function main() {
     return;
   }
 
-  const result = spawnSync("pagefind", {
+  const executable = path.resolve("node_modules", ".bin", process.platform === "win32" ? "pagefind.cmd" : "pagefind");
+  const result = spawnSync(executable, {
     cwd: process.cwd(),
     stdio: "inherit",
     shell: process.platform === "win32",
