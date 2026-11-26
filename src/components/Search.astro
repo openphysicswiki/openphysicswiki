@@ -1,0 +1,74 @@
+---
+import "@pagefind/component-ui/css/pagefind-component-ui.css";
+
+const resultTemplate = `
+  <li class="search-result">
+    <p class="search-result-meta">{{ meta.field }} <span aria-hidden="true">·</span> {{ meta.type }}</p>
+    <a class="search-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}</a>
+    {{#if excerpt}}
+    <p class="search-result-excerpt">{{+ excerpt +}}</p>
+    {{/if}}
+  </li>
+`;
+
+const searchHint = import.meta.env.DEV
+  ? "Search runs on the built site: npm run build && npm run preview."
+  : "Search by result, concept, or assumption.";
+---
+<span class="search-shell">
+  <pagefind-config bundle-path="/pagefind/" excerpt-length="24"></pagefind-config>
+  <pagefind-modal-trigger placeholder="Search" shortcut="mod+k"></pagefind-modal-trigger>
+  <pagefind-modal>
+    <pagefind-modal-header>
+      <pagefind-input placeholder="Search physics entries…" debounce="180"></pagefind-input>
+    </pagefind-modal-header>
+    <pagefind-modal-body>
+      <pagefind-summary default-message={searchHint}></pagefind-summary>
+      <pagefind-results hide-sub-results>
+        <script type="text/pagefind-template" set:html={resultTemplate} />
+      </pagefind-results>
+    </pagefind-modal-body>
+    <pagefind-modal-footer>
+      <pagefind-keyboard-hints></pagefind-keyboard-hints>
+    </pagefind-modal-footer>
+  </pagefind-modal>
+</span>
+
+<script>
+  import "@pagefind/component-ui";
+</script>
+
+<style>
+  .search-shell {
+    --pf-font: var(--font-sans);
+    --pf-text: var(--text);
+    --pf-text-secondary: var(--muted);
+    --pf-text-muted: var(--faint);
+    --pf-background: var(--surface);
+    --pf-border: var(--line);
+    --pf-border-focus: var(--accent);
+    --pf-hover: var(--surface-subtle);
+    --pf-mark: var(--accent-strong);
+    --pf-outline-focus: var(--accent);
+    --pf-skeleton: var(--surface-subtle);
+    --pf-skeleton-shine: var(--line);
+    --pf-modal-backdrop: rgb(0 0 0 / 0.55);
+    --pf-modal-max-width: 650px;
+    --pf-modal-max-height: min(78dvh, 720px);
+    --pf-modal-top: 9dvh;
+    --pf-results-gap: 0;
+    --pf-border-radius: 8px;
+    display: inline-flex;
+  }
+  .search-shell :global(pagefind-modal pagefind-input) { --pf-input-height: 48px; }
+  .search-shell :global(.search-result) { padding: 1rem 0.25rem; border-bottom: 1px solid var(--pf-border); list-style: none; }
+  .search-shell :global(.search-result:last-child) { border-bottom: 0; }
+  .search-shell :global(.search-result-meta) { margin: 0 0 0.25rem; color: var(--accent); font-family: var(--font-mono); font-size: 0.62rem; font-weight: 650; letter-spacing: 0.05em; text-transform: uppercase; }
+  .search-shell :global(.search-result-link) { color: var(--text); font-size: 1rem; font-weight: 650; letter-spacing: -0.015em; text-decoration: none; }
+  .search-shell :global(.search-result-link:hover) { color: var(--accent); text-decoration: underline; text-underline-offset: 0.18em; }
+  .search-shell :global(.search-result-excerpt) { margin: 0.35rem 0 0; color: var(--muted); font-family: var(--font-serif); font-size: 0.84rem; line-height: 1.55; }
+  .search-shell :global(.search-result-excerpt mark) { padding: 0 0.08em; background: var(--selection); color: var(--accent-strong); }
+  @media (max-width: 620px) {
+    .search-shell { --pf-modal-top: 3dvh; --pf-modal-max-height: 90dvh; }
+  }
+</style>

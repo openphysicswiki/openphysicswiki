@@ -1,0 +1,6 @@
+site: dist
+# Entries live at /<field>/<slug>/; field indexes and project pages are excluded.
+glob: "*/*/index.html"
+# Keep rendered MathML/KaTeX markup out of prose excerpts and text ranking.
+exclude_selectors:
+  - ".katex"

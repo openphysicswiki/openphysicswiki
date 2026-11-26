@@ -1,6 +1,8 @@
 ---
 import "katex/dist/katex.min.css";
+import { getCollection } from "astro:content";
 import "../styles/global.css";
+import Search from "../components/Search.astro";
 import { SITE } from "../data/site";
 
 interface Props {
@@ -11,6 +13,7 @@ interface Props {
 const { title, description = SITE.description, wide = false } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} · Physics from first principles`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const hasEntries = (await getCollection("entries")).length > 0;
 ---
 <!doctype html>
 <html lang="en">
@@ -50,6 +53,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <span>openphysics<span class="wordmark-dot">.wiki</span></span>
         </a>
         <nav class="header-nav" aria-label="Main navigation">
+          {hasEntries && <Search />}
           <a href="/about/">About</a>
           <a href="/contribute/">Contribute</a>
           <button class="theme-toggle" type="button" aria-label="Switch color theme">
@@ -113,8 +117,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   .footer-inner a:hover { color: var(--text); }
   @media (max-width: 620px) {
     .header-nav { gap: 0.75rem; }
-    .header-nav > a:first-child { display: none; }
+    .header-nav > a { display: none; }
     .wordmark { font-size: 0.88rem; }
+    .theme-toggle [data-theme-label] { display: none; }
     .footer-inner { flex-direction: column; }
   }
 </style>
