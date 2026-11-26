@@ -74,7 +74,7 @@ test("invalid schema and malformed sections are reported", () => {
     addEntry(directory, "isolated");
     const file = path.join(directory, "classical-mechanics", "isolated.md");
     const original = readFileSync(file, "utf8");
-    writeFileSync(file, original.replace("type: definition", "type: essay").replace("## Assumptions\nNone.", "## Notes\nNothing."));
+    writeFileSync(file, original.replace("type: definition", "type: example").replace("## Assumptions\nNone.", "## Notes\nNothing."));
     const messages = validateContent(directory).map((issue) => issue.message).join("\n");
     assert.match(messages, /type:.*(Invalid|invalid|expected)/);
     assert.match(messages, /Missing required ## Assumptions/);

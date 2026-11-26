@@ -4,7 +4,7 @@ Small, focused patches are preferred: one correction, one clarified assumption, 
 
 ## Content rules
 
-1. Write one result per file: a definition, axiom, principle, theorem, technique, or example.
+1. Write one result per file: a definition, axiom, principle, theorem, or technique.
 2. State all assumptions and include a concise derivation where relevant.
 3. Write from scratch. Never copy textbook or online prose, derivations, or problems. Sources may be used only to cross-check results.
 4. Link direct prerequisites in `dependencies`. Never maintain or generate a graph by hand.

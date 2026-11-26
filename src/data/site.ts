@@ -10,7 +10,6 @@ export const ENTRY_TYPES = [
   { id: "principle", label: "Principle", code: "P" },
   { id: "theorem", label: "Theorem", code: "T" },
   { id: "technique", label: "Technique", code: "M" },
-  { id: "example", label: "Example", code: "E" },
 ] as const;
 
 export type EntryType = (typeof ENTRY_TYPES)[number]["id"];

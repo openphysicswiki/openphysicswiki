@@ -72,7 +72,6 @@ const graphId = `graph-${crypto.randomUUID()}`;
                   node.type === "axiom" ? <path class="node-shape" d={`M18 0H${node.width - 18}L${node.width} 18V${node.height - 18}L${node.width - 18} ${node.height}H18L0 ${node.height - 18}V18Z`} /> :
                   node.type === "principle" ? <path class="node-shape" d={`M24 0H${node.width - 24}L${node.width} ${node.height / 2}L${node.width - 24} ${node.height}H24L0 ${node.height / 2}Z`} /> :
                   node.type === "technique" ? <rect class="node-shape dashed" width={node.width} height={node.height} rx="4" /> :
-                  node.type === "example" ? <path class="node-shape" d={`M14 0H${node.width - 14}L${node.width} 14V${node.height - 14}L${node.width - 14} ${node.height}H14L0 ${node.height - 14}V14Z`} /> :
                   <rect class="node-shape" width={node.width} height={node.height} rx="3" />}
                 <text class="node-code" x="14" y="18" aria-hidden="true">{type.code}</text>
                 {node.foundational && <text class="foundation-mark" x={node.width - 15} y="18" text-anchor="end" aria-hidden="true">◆</text>}
@@ -166,7 +165,6 @@ const graphId = `graph-${crypto.randomUUID()}`;
   .type-principle { --node: var(--type-principle); }
   .type-theorem { --node: var(--type-theorem); }
   .type-technique { --node: var(--type-technique); }
-  .type-example { --node: var(--type-example); }
   .graph-node:hover .node-shape, .graph-node:focus .node-shape, .graph-node.is-origin .node-shape { fill: color-mix(in srgb, var(--node) 17%, var(--surface)); stroke-width: 3; }
   .has-highlight .graph-node:not(.is-active), .has-highlight .graph-edge:not(.is-active) { opacity: 0.16; }
   .graph-edge.is-active { stroke: var(--accent); stroke-width: 2.2; opacity: 0.95; }

@@ -6,7 +6,6 @@ export const ENTRY_TYPES = [
   "principle",
   "theorem",
   "technique",
-  "example",
 ] as const;
 
 export const slugSchema = z

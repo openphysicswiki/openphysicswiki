@@ -9,7 +9,6 @@ import { ENTRY_TYPES } from "../data/site";
           type.id === "axiom" ? <path d="M7 3h14l5 7-5 7H7l-5-7Z" /> :
           type.id === "principle" ? <path d="m8 3-6 7 6 7h12l6-7-6-7Z" /> :
           type.id === "technique" ? <rect class="dashed" x="2" y="3" width="24" height="14" /> :
-          type.id === "example" ? <path d="m7 3-5 4v6l5 4h14l5-4V7l-5-4Z" /> :
           <rect x="2" y="3" width="24" height="14" rx="1" />}
       </svg>
       <span class="legend-code" aria-hidden="true">{type.code}</span>{type.label}
@@ -29,7 +28,6 @@ import { ENTRY_TYPES } from "../data/site";
   .type-principle { --badge: var(--type-principle); }
   .type-theorem { --badge: var(--type-theorem); }
   .type-technique { --badge: var(--type-technique); }
-  .type-example { --badge: var(--type-example); }
   .foundation-symbol { color: var(--accent); font-size: 0.65rem; }
   .foundation-key { margin-left: 0.25rem; padding-left: 1rem; border-left: 1px solid var(--line); }
 </style>

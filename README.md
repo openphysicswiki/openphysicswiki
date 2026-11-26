@@ -48,11 +48,11 @@ summary: "The net work on a particle equals its change in kinetic energy."
 ...
 ```
 
-- **Types:** `definition`, `axiom`, `principle`, `theorem`, `technique`, `example`.
+- **Types:** `definition`, `axiom`, `principle`, `theorem`, `technique`.
 - **Foundational:** mark definitions and axioms that are conceptual starting points. The marker is independent of dependency count.
 - **Dependencies:** direct prerequisite slugs only. Use `[]` for a starting point. Do not list transitive prerequisites unless the statement or derivation directly uses them.
 - **Sections:** `Statement` and `Assumptions` are required and nonempty; `Derivation` is optional. No other headings are allowed.
-- **Original writing:** write every statement, derivation, and example from scratch. External references may only cross-check correctness.
+- **Original writing:** write all entry content from scratch. External references may only cross-check correctness.
 
 An edge points **prerequisite → dependent**. Field maps include that field's entries. Entry maps include the full transitive ancestor and descendant sets. Both maps are generated at build time; there is no hand-maintained graph file.
 
