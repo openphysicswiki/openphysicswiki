@@ -39,6 +39,19 @@ const searchHint = import.meta.env.DEV
 
   type SearchModal = HTMLElement & { open: () => void; isOpen: boolean };
 
+  const searchModal = document.querySelector<SearchModal>("pagefind-modal");
+  searchModal?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.defaultPrevented || event.isComposing) return;
+    if (!(event.target instanceof HTMLInputElement)) return;
+
+    const topResult = searchModal.querySelector<HTMLAnchorElement>("pagefind-results .search-result-link");
+    if (!topResult) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    topResult.click();
+  });
+
   document.addEventListener("keydown", (event) => {
     const modal = document.querySelector<SearchModal>("pagefind-modal");
     if (!modal || modal.isOpen || event.defaultPrevented || event.isComposing) return;
