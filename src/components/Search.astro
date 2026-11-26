@@ -40,16 +40,68 @@ const searchHint = import.meta.env.DEV
   type SearchModal = HTMLElement & { open: () => void; isOpen: boolean };
 
   const searchModal = document.querySelector<SearchModal>("pagefind-modal");
+  const results = document.querySelector<HTMLElement>("pagefind-results");
+
+  if (results) {
+    let resultSignature = "";
+    const selectResult = (candidate?: Element | null) => {
+      const items = [...results.querySelectorAll(".search-result")];
+      const selected = candidate ?? items[0];
+      if (!selected) return;
+      items.forEach((item) => {
+        item.classList.remove("is-active");
+        item.querySelectorAll("[data-pf-selected]").forEach((link) => link.removeAttribute("data-pf-selected"));
+      });
+      selected.classList.add("is-active");
+      selected.querySelector("a")?.setAttribute("data-pf-selected", "");
+    };
+    const syncResults = () => {
+      const items = [...results.querySelectorAll(".search-result")];
+      const nextSignature = items.map((item) => item.querySelector("a")?.getAttribute("href") ?? "").join("|");
+      if (nextSignature !== resultSignature) {
+        resultSignature = nextSignature;
+        selectResult();
+      } else if (!results.querySelector(".is-active")) {
+        selectResult(items.find((item) => item.contains(document.activeElement)) ?? items[0]);
+      }
+    };
+    const eventResult = (event: Event) => event.target instanceof Element
+      ? event.target.closest(".search-result")
+      : null;
+
+    new MutationObserver(syncResults).observe(results, { childList: true, subtree: true });
+    results.addEventListener("pointerover", (event) => selectResult(eventResult(event)));
+    results.addEventListener("pointerdown", (event) => selectResult(eventResult(event)));
+    results.addEventListener("focusin", (event) => selectResult(eventResult(event)));
+    results.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      const items = [...results.querySelectorAll(".search-result")];
+      if (items.length === 0) return;
+      const active = results.querySelector(".is-active");
+      const current = active ? Math.max(0, items.indexOf(active)) : 0;
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const next = Math.max(0, Math.min(items.length - 1, current + direction));
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      selectResult(items[next]);
+      items[next].querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
+      items[next].scrollIntoView({ block: "nearest" });
+    }, true);
+    syncResults();
+  }
+
   searchModal?.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.defaultPrevented || event.isComposing) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     if (!(event.target instanceof HTMLInputElement)) return;
 
-    const topResult = searchModal.querySelector<HTMLAnchorElement>("pagefind-results .search-result-link");
-    if (!topResult) return;
+    const selectedLink = results?.querySelector<HTMLAnchorElement>(".search-result.is-active .search-result-link")
+      ?? results?.querySelector<HTMLAnchorElement>(".search-result-link");
+    if (!selectedLink) return;
 
     event.preventDefault();
     event.stopPropagation();
-    topResult.click();
+    selectedLink.click();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -96,8 +148,10 @@ const searchHint = import.meta.env.DEV
     display: inline-flex;
   }
   .search-shell :global(pagefind-modal pagefind-input) { --pf-input-height: 48px; }
-  .search-shell :global(.search-result) { padding: 1rem 0.25rem; border-bottom: 1px solid var(--pf-border); list-style: none; }
+  .search-shell :global(.search-result) { padding: 0.85rem 0.75rem; border-bottom: 1px solid var(--pf-border); border-radius: 0.35rem; list-style: none; transition: background-color 120ms, box-shadow 120ms; }
   .search-shell :global(.search-result:last-child) { border-bottom: 0; }
+  .search-shell :global(.search-result.is-active) { background: var(--surface-subtle); box-shadow: inset 3px 0 var(--accent); }
+  .search-shell :global(.search-result:not(.is-active)) { background: transparent; box-shadow: none; }
   .search-shell :global(.search-result-meta) { margin: 0 0 0.25rem; color: var(--accent); font-family: var(--font-mono); font-size: 0.62rem; font-weight: 650; letter-spacing: 0.05em; text-transform: uppercase; }
   .search-shell :global(.search-result-link) { color: var(--text); font-size: 1rem; font-weight: 650; letter-spacing: -0.015em; text-decoration: none; }
   .search-shell :global(.search-result-link:hover) { color: var(--accent); text-decoration: underline; text-underline-offset: 0.18em; }
