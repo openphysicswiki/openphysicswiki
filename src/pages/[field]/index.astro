@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import DependencyGraph from "../../components/DependencyGraph.astro";
+import EntryFilters from "../../components/EntryFilters.astro";
 import GraphLegend from "../../components/GraphLegend.astro";
 import TypeBadge from "../../components/TypeBadge.astro";
 import { FIELDS } from "../../data/fields";
@@ -59,9 +60,10 @@ const foundationalCount = fieldEntries.filter((entry) => entry.data.foundational
             <h2 id="index-heading">All entries</h2>
             <span>Alphabetical · dependencies shown on each page</span>
           </div>
-          <ol class="entry-list">
+          <EntryFilters entries={fieldEntries.map((entry) => ({ type: entry.data.type }))} />
+          <ol class="entry-list" id="entry-list">
             {fieldEntries.map((entry, index) => (
-              <li>
+              <li data-entry-type={entry.data.type}>
                 <span class="entry-number">{String(index + 1).padStart(2, "0")}</span>
                 <a href={entryUrl(entry)}>
                   <span class="entry-list-title">{entry.data.title}</span>
@@ -108,6 +110,7 @@ const foundationalCount = fieldEntries.filter((entry) => entry.data.foundational
   .index-heading-row span { color: var(--muted); font-size: 0.7rem; }
   .entry-list { list-style: none; margin: 0; padding: 0; }
   .entry-list li { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+  .entry-list li[hidden] { display: none; }
   .entry-number { color: var(--faint); font-family: var(--font-mono); font-size: 0.68rem; }
   .entry-list li > a { display: grid; grid-template-columns: minmax(12rem, 0.75fr) minmax(0, 1fr); align-items: center; gap: 1.5rem; color: var(--text); text-decoration: none; }
   .entry-list li > a:hover .entry-list-title { color: var(--accent); }

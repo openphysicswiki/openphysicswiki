@@ -1,0 +1,82 @@
+---
+import { ENTRY_TYPES } from "../data/site";
+
+interface Props {
+  entries: { type: string }[];
+}
+const { entries } = Astro.props;
+const typeCounts = ENTRY_TYPES.map((type) => ({
+  ...type,
+  count: entries.filter((entry) => entry.type === type.id).length,
+})).filter((type) => type.count > 0);
+---
+<div class="entry-filter-bar">
+  <div class="entry-filters" role="group" aria-label="Filter entries by type" data-entry-filters>
+    <button class="filter-button filter-all" type="button" data-filter="all" aria-pressed="true" aria-controls="entry-list">
+      All <span class="filter-count">{entries.length}</span>
+    </button>
+    {typeCounts.map((type) => (
+      <button class:list={["filter-button", `type-${type.id}`]} type="button" data-filter={type.id} aria-pressed="false" aria-controls="entry-list">
+        {type.label}s <span class="filter-count">{type.count}</span>
+      </button>
+    ))}
+  </div>
+  <span class="filter-status" data-filter-status>{entries.length} entries</span>
+  <span class="sr-only" aria-live="polite" data-filter-announcement></span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-entry-filters]").forEach((group) => {
+    const section = group.closest(".entry-index");
+    const bar = group.closest(".entry-filter-bar");
+    if (!section || !bar) return;
+
+    const items = [...section.querySelectorAll<HTMLElement>("[data-entry-type]")];
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>("button[data-filter]")];
+    const status = bar.querySelector<HTMLElement>("[data-filter-status]");
+    const announcement = bar.querySelector<HTMLElement>("[data-filter-announcement]");
+
+    const applyFilter = (filter: string) => {
+      let shown = 0;
+      items.forEach((item) => {
+        const visible = filter === "all" || item.dataset.entryType === filter;
+        item.hidden = !visible;
+        if (visible) {
+          shown += 1;
+          const number = item.querySelector<HTMLElement>(".entry-number");
+          if (number) number.textContent = String(shown).padStart(2, "0");
+        }
+      });
+      buttons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.filter === filter)));
+      if (status) status.textContent = `${shown} of ${items.length} ${items.length === 1 ? "entry" : "entries"}`;
+      if (announcement) announcement.textContent = `Showing ${shown} ${filter === "all" ? "" : `${filter} `}${shown === 1 ? "entry" : "entries"}.`;
+    };
+
+    group.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest<HTMLButtonElement>("button[data-filter]");
+      if (button?.dataset.filter) applyFilter(button.dataset.filter);
+    });
+  });
+</script>
+
+<style>
+  .entry-filter-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0 0.65rem; }
+  .entry-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .filter-button { --filter: var(--faint); display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.32rem 0.6rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: 0.72rem; line-height: 1.35; white-space: nowrap; }
+  .filter-button:hover { border-color: var(--filter); color: var(--filter); }
+  .filter-button[aria-pressed="true"] { border-color: color-mix(in srgb, var(--filter) 65%, var(--line)); background: color-mix(in srgb, var(--filter) 10%, transparent); color: var(--filter); font-weight: 650; }
+  .filter-count { font-family: var(--font-mono); font-size: 0.64rem; opacity: 0.72; }
+  .filter-all { --filter: var(--accent); }
+  .type-definition { --filter: var(--type-definition); }
+  .type-axiom { --filter: var(--type-axiom); }
+  .type-principle { --filter: var(--type-principle); }
+  .type-theorem { --filter: var(--type-theorem); }
+  .type-technique { --filter: var(--type-technique); }
+  .type-example { --filter: var(--type-example); }
+  .filter-status { flex: none; color: var(--muted); font-family: var(--font-mono); font-size: 0.66rem; }
+  @media (max-width: 620px) {
+    .entry-filter-bar { align-items: flex-start; flex-direction: column; gap: 0.55rem; }
+    .entry-filters { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem; }
+  }
+</style>
