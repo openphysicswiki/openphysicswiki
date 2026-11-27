@@ -26,6 +26,7 @@
     "katex": "^0.19.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
+    "yargs": "^18.2.0",
     "zod": "^4.6.7"
   },
   "overrides": {

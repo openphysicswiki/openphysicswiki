@@ -1,0 +1,64 @@
+# Test Excerpt - Classical Mechanics Textbook
+
+## Chapter 3: Work and Energy
+
+### 3.1 Work Done by a Constant Force
+
+When a constant force F acts on a particle, causing it to move through a displacement d, the work done by the force is defined as the dot product of the force and displacement vectors:
+
+W = F · d = |F||d|cosθ
+
+where θ is the angle between the force and displacement vectors.
+
+Assumptions:
+- The force is constant (does not change in magnitude or direction)
+- The object can be treated as a point particle
+- The displacement is straight (no curved path)
+
+### 3.2 Work-Energy Theorem
+
+The work-energy theorem states that the net work done on a particle equals its change in kinetic energy.
+
+Mathematically:
+W_net = ΔK = K_final - K_initial
+
+where K = ½mv² is the kinetic energy.
+
+Assumptions:
+- The particle has constant mass
+- The frame of reference is inertial
+- The forces may be variable, but the particle's speed is non-relativistic
+
+Derivation:
+Starting from Newton's second law, F_net = ma, and the definition of work for a variable force:
+
+W_net = ∫ F_net · dr
+
+Substituting F_net = m dv/dt and dr = v dt:
+
+W_net = ∫ m (dv/dt) · v dt = m ∫ v · dv
+
+For constant mass, this becomes:
+
+W_net = ½m ∫ d(v·v) = ½m [v_final² - v_initial²] = K_final - K_initial
+
+### 3.3 Conservative Forces
+
+A force is conservative if the work done by the force on a particle moving between two points is independent of the path taken, depending only on the initial and final positions.
+
+Equivalently, a force is conservative if the work done around any closed path is zero.
+
+Examples of conservative forces:
+- Gravitational force
+- Spring force (Hooke's law)
+- Electrostatic force
+
+Non-conservative forces include friction and drag.
+
+Assumptions for path independence:
+- The force field is static (does not change with time)
+- The particle moves through a simply connected region
+
+---
+
+This is a test excerpt. The actual textbook would have more content, but this demonstrates the format and content structure.
