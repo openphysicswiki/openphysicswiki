@@ -1,11 +1,10 @@
 ---
 title: "Newton's second law"
 slug: newtons-second-law
-type: axiom
 field: classical-mechanics
-foundational: true
-dependencies: [newtons-first-law, linear-momentum]
 summary: "Newton's second law equates net external force to the time derivative of linear momentum in an inertial frame."
+roles:
+  newtonian: { type: axiom, foundational: true, dependencies: [newtons-first-law, linear-momentum] }
 ---
 ## Statement
 Relative to an inertial frame, the net external force on a point particle satisfies

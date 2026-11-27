@@ -1,11 +1,10 @@
 ---
 title: "Lagrangian"
 slug: lagrangian
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [kinetic-energy, potential-energy, generalized-coordinates]
 summary: "The Lagrangian is kinetic energy minus potential energy expressed in generalized coordinates and velocities."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [kinetic-energy, potential-energy, generalized-coordinates] }
 ---
 ## Statement
 For independent generalized coordinates $q=(q_1,\ldots,q_n)$, the Lagrangian is

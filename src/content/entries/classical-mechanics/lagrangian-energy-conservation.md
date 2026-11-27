@@ -1,11 +1,10 @@
 ---
 title: "Conservation of energy in Lagrangian mechanics"
 slug: lagrangian-energy-conservation
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [euler-lagrange-equations, lagrangian]
 summary: "The Lagrangian energy function h is conserved when the Lagrangian has no explicit time dependence."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [euler-lagrange-equations, lagrangian] }
 ---
 ## Statement
 Define the Lagrangian energy function

@@ -1,11 +1,10 @@
 ---
 title: "Generalized momentum"
 slug: generalized-momentum
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [lagrangian]
 summary: "The generalized momentum conjugate to a coordinate is the Lagrangian's derivative with respect to that coordinate's velocity."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [lagrangian] }
 ---
 ## Statement
 The generalized momentum $p_j$ conjugate to coordinate $q_j$ is

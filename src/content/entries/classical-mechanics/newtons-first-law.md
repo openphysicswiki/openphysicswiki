@@ -1,11 +1,10 @@
 ---
 title: "Newton's first law"
 slug: newtons-first-law
-type: axiom
 field: classical-mechanics
-foundational: true
-dependencies: [inertial-frame]
 summary: "Newton's first law asserts that inertial reference frames exist."
+roles:
+  newtonian: { type: axiom, foundational: true, dependencies: [inertial-frame] }
 ---
 ## Statement
 At least one inertial reference frame exists: there is at least one frame satisfying the free-particle criterion.

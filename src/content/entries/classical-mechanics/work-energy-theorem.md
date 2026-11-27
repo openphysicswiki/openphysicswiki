@@ -1,11 +1,10 @@
 ---
 title: "Work–energy theorem"
 slug: work-energy-theorem
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [work, kinetic-energy, newtons-second-law]
 summary: "The net work on a constant-mass particle equals its change in kinetic energy."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [work, kinetic-energy, newtons-second-law] }
 ---
 ## Statement
 For a point particle moving between times $t_1$ and $t_2$, the work done by the net force is

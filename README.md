@@ -34,11 +34,12 @@ Entries live at `src/content/entries/<field>/<slug>.md`. The path, field, and sl
 ---
 title: "Work–energy theorem"
 slug: work-energy-theorem
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [work, kinetic-energy, newtons-second-law]
 summary: "The net work on a particle equals its change in kinetic energy."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [work, kinetic-energy, newtons-second-law] }
+relations:
+  - { type: generalizes, target: work-energy-theorem-constant-force }
 ---
 ## Statement
 ...
@@ -48,13 +49,16 @@ summary: "The net work on a particle equals its change in kinetic energy."
 ...
 ```
 
+- **Frameworks:** a field can be built up in more than one way (Newtonian, Lagrangian, …). Frameworks are registered in [`src/data/frameworks.ts`](src/data/frameworks.ts); each field has one default. A framework may `buildsOn` others (for example, a shared kinematics layer), and its entries may then depend on theirs.
+- **Roles:** an entry has one role per framework it belongs to, keyed by framework slug. A role holds what varies between frameworks: the type, the foundational marker, and the dependencies. The statement and assumptions are shared; if they would differ, it is a different concept and gets its own entry.
 - **Types:** `definition`, `axiom`, `principle`, `theorem`, `technique`.
 - **Foundational:** mark definitions and axioms that are conceptual starting points. The marker is independent of dependency count.
-- **Dependencies:** direct prerequisite slugs only. Use `[]` for a starting point. Do not list transitive prerequisites unless the statement or derivation directly uses them.
-- **Sections:** `Statement` and `Assumptions` are required and nonempty; `Derivation` is optional. No other headings are allowed.
+- **Dependencies:** direct prerequisite slugs only, within the role's framework or a framework it builds on. Use `[]` for a starting point. Do not list transitive prerequisites unless the statement or derivation directly uses them.
+- **Relations** (optional): links that are not dependencies: `special-case-of`, `generalizes`, and `equivalent-under` (which requires `conditions`). They never take part in cycle or orphan checks.
+- **Sections:** `Statement` and `Assumptions` are required and nonempty; `Derivation` is optional. An entry with several roles names each derivation: `## Derivation (newtonian)`. No other headings are allowed.
 - **Original writing:** write all entry content from scratch. External references may only cross-check correctness.
 
-An edge points **prerequisite → dependent**. Field maps include that field's entries. Entry maps include the full transitive ancestor and descendant sets. Both maps are generated at build time; there is no hand-maintained graph file.
+An edge points **prerequisite → dependent**. Each framework has its own graph, so a result can be derived one way in one framework and the other way round in another. Field maps show the field's default framework. Entry maps include the full transitive ancestor and descendant sets. Both maps are generated at build time; there is no hand-maintained graph file.
 
 ## Validation
 
@@ -62,11 +66,13 @@ An edge points **prerequisite → dependent**. Field maps include that field's e
 
 - malformed or unknown frontmatter fields;
 - invalid types, slugs, fields, paths, summaries, and duplicate dependencies;
+- unknown frameworks, or frameworks from another field;
 - duplicate or self-referencing slugs;
-- unresolved references;
-- dependency cycles;
-- orphan entries (no prerequisite and no dependent);
-- missing, empty, duplicated, or unsupported sections.
+- unresolved references, and dependencies outside a role's framework (and those it builds on);
+- dependency cycles within a framework;
+- orphan entries (no prerequisite and no dependent in their framework);
+- unresolved, duplicate, or self-referencing relations, and `equivalent-under` without conditions;
+- missing, empty, duplicated, or unsupported sections, and derivations naming a framework the entry has no role in.
 
 An empty collection is valid. Validation runs in [`Validate`](.github/workflows/validate.yml) on every push and pull request. To make it a required PR check in GitHub, enable branch protection for `main`, select **Require status checks to pass before merging**, and add the **Validate** check from this workflow.
 

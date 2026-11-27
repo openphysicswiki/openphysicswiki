@@ -1,11 +1,10 @@
 ---
 title: "Inertial frame"
 slug: inertial-frame
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [kinematics]
 summary: "An inertial frame is one in which a particle with zero net external force has zero acceleration."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [kinematics] }
 ---
 ## Statement
 An inertial frame is a reference frame in which every free test point particle has $\mathbf a=\mathbf 0$, equivalently constant velocity $\mathbf v$. A free particle has zero net external force.

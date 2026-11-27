@@ -1,11 +1,10 @@
 ---
 title: "Generalized coordinates"
 slug: generalized-coordinates
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [kinematics]
 summary: "Generalized coordinates are independent parameters describing every configuration allowed by holonomic constraints."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [kinematics] }
 ---
 ## Statement
 A set $q=(q_1,\ldots,q_n)$ of $n$ independent generalized coordinates specifies every allowed configuration of an $N$-particle system through

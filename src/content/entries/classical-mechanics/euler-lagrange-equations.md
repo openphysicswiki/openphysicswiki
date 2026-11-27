@@ -1,11 +1,10 @@
 ---
 title: "Euler–Lagrange equations"
 slug: euler-lagrange-equations
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [dalemberts-principle, lagrangian]
 summary: "Smooth admissible trajectories satisfy one Euler–Lagrange equation for each independent generalized coordinate."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [dalemberts-principle, lagrangian] }
 ---
 ## Statement
 The physical trajectory $q(t)$ satisfies, for each $j=1,\ldots,n$,

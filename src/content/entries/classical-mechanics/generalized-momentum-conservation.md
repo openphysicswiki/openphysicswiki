@@ -1,11 +1,10 @@
 ---
 title: "Conservation of generalized momentum"
 slug: generalized-momentum-conservation
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [euler-lagrange-equations, generalized-momentum]
 summary: "The generalized momentum conjugate to a cyclic coordinate is constant along every Euler–Lagrange solution."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [euler-lagrange-equations, generalized-momentum] }
 ---
 ## Statement
 If $q_k$ is cyclic (ignorable), meaning

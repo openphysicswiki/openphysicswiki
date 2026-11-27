@@ -22,11 +22,10 @@ import { SITE } from "../data/site";
       <pre><code>---
 title: "Work–energy theorem"
 slug: work-energy-theorem
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [work, kinetic-energy, newtons-second-law]
 summary: "The net work on a particle equals its change in kinetic energy."
+roles:
+  newtonian: &#123; type: theorem, foundational: false, dependencies: [work, kinetic-energy, newtons-second-law] &#125;
 ---
 ## Statement
 ...
@@ -34,7 +33,7 @@ summary: "The net work on a particle equals its change in kinetic energy."
 ...
 ## Derivation
 ...</code></pre>
-      <p>Use <code>dependencies: []</code> for a true starting point. Definitions and axioms are marked <code>foundational: true</code>. Empty collections are valid; isolated entries are not.</p>
+      <p>Each role belongs to a framework, such as <code>newtonian</code>, and holds the type and the direct prerequisites within that framework. Use <code>dependencies: []</code> for a true starting point. Definitions and axioms are marked <code>foundational: true</code>. Empty collections are valid; isolated entries are not.</p>
     </section>
 
     <section>

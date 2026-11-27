@@ -6,7 +6,8 @@ import EntryFilters from "../../components/EntryFilters.astro";
 import GraphLegend from "../../components/GraphLegend.astro";
 import TypeBadge from "../../components/TypeBadge.astro";
 import { FIELDS } from "../../data/fields";
-import { getEntries, toGraphEntry, entryUrl, type Entry } from "../../lib/entries";
+import { defaultFramework } from "../../data/frameworks";
+import { getEntries, graphEntries, primaryRole, entryUrl, type Entry } from "../../lib/entries";
 import { DependencyGraph as MechanicsGraph } from "../../lib/graph";
 
 export async function getStaticPaths() {
@@ -23,9 +24,11 @@ interface Props {
 }
 const { field, entries } = Astro.props;
 const fieldEntries = entries.filter((entry) => entry.data.field === field.slug);
-const graph = new MechanicsGraph(entries.map(toGraphEntry));
-const visible = new Set(fieldEntries.map((entry) => entry.data.slug));
-const foundationalCount = fieldEntries.filter((entry) => entry.data.foundational).length;
+// The map shows the field's default framework; a framework switcher comes with the second framework.
+const framework = defaultFramework(field.slug);
+const graph = new MechanicsGraph(framework ? graphEntries(entries, framework.slug) : []);
+const visible = new Set(fieldEntries.map((entry) => entry.data.slug).filter((slug) => graph.byId.has(slug)));
+const foundationalCount = fieldEntries.filter((entry) => primaryRole(entry).foundational).length;
 ---
 <BaseLayout title={field.name} description={field.description} wide>
   <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: field.name }]} />
@@ -60,16 +63,16 @@ const foundationalCount = fieldEntries.filter((entry) => entry.data.foundational
             <h2 id="index-heading">All entries</h2>
             <span>Alphabetical · dependencies shown on each page</span>
           </div>
-          <EntryFilters entries={fieldEntries.map((entry) => ({ type: entry.data.type }))} />
+          <EntryFilters entries={fieldEntries.map((entry) => ({ type: primaryRole(entry).type }))} />
           <ol class="entry-list" id="entry-list">
             {fieldEntries.map((entry, index) => (
-              <li data-entry-type={entry.data.type}>
+              <li data-entry-type={primaryRole(entry).type}>
                 <span class="entry-number">{String(index + 1).padStart(2, "0")}</span>
                 <a href={entryUrl(entry)}>
                   <span class="entry-list-title">{entry.data.title}</span>
                   <span class="entry-list-summary">{entry.data.summary}</span>
                 </a>
-                <TypeBadge type={entry.data.type} />
+                <TypeBadge type={primaryRole(entry).type} />
               </li>
             ))}
           </ol>

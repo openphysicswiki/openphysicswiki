@@ -5,8 +5,9 @@ import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import DependencyGraph from "../../../components/DependencyGraph.astro";
 import TypeBadge from "../../../components/TypeBadge.astro";
 import { getField } from "../../../data/fields";
+import { getFramework } from "../../../data/frameworks";
 import { getEntryType } from "../../../data/site";
-import { getEntries, toGraphEntry, type Entry } from "../../../lib/entries";
+import { getEntries, graphEntries, primaryFramework, rolesOf, entryUrl, type Entry } from "../../../lib/entries";
 import { DependencyGraph as GraphModel } from "../../../lib/graph";
 
 export async function getStaticPaths() {
@@ -21,7 +22,16 @@ interface Props { entry: Entry; entries: Entry[] }
 const { entry, entries } = Astro.props;
 const { Content } = await render(entry);
 const field = getField(entry.data.field)!;
-const graph = new GraphModel(entries.map(toGraphEntry));
+const framework = primaryFramework(entry);
+const role = entry.data.roles[framework as keyof Entry["data"]["roles"]]!;
+const otherRoles = rolesOf(entry).filter(([name]) => name !== framework);
+const bySlug = new Map(entries.map((candidate) => [candidate.data.slug, candidate]));
+const RELATION_LABELS: Record<string, string> = {
+  "special-case-of": "Special case of",
+  generalizes: "Generalizes",
+  "equivalent-under": "Equivalent to",
+};
+const graph = new GraphModel(graphEntries(entries, framework));
 const visible = graph.neighborhood(entry.data.slug);
 const ancestors = graph.ancestors(entry.data.slug);
 const descendants = graph.descendants(entry.data.slug);
@@ -34,16 +44,39 @@ const descendants = graph.descendants(entry.data.slug);
       { label: entry.data.title },
     ]} />
     <header class="entry-header" data-pagefind-meta={`aliases:${entry.data.slug.replaceAll("-", " ")}`}>
-      <div class="entry-labels" data-pagefind-meta={`type:${getEntryType(entry.data.type).label}`}>
-        <TypeBadge type={entry.data.type} />
-        {entry.data.foundational && <span class="foundational-badge"><span aria-hidden="true">◆</span> Foundational</span>}
+      <div class="entry-labels" data-pagefind-meta={`type:${getEntryType(role.type).label}`}>
+        <TypeBadge type={role.type} />
+        {role.foundational && <span class="foundational-badge"><span aria-hidden="true">◆</span> Foundational</span>}
       </div>
       <h1>{entry.data.title}</h1>
       <p class="lede">{entry.data.summary}</p>
+      {otherRoles.length > 0 && (
+        <p class="entry-roles">
+          {getEntryType(role.type).label} in {getFramework(framework)?.name ?? framework}
+          {otherRoles.map(([name, other]) => <span> · {getEntryType(other.type).label} in {getFramework(name)?.name ?? name}</span>)}
+        </p>
+      )}
     </header>
     <div class="prose">
       <Content />
     </div>
+    {entry.data.relations.length > 0 && (
+      <section class="entry-relations" aria-labelledby="relations-heading">
+        <h2 id="relations-heading">Related results</h2>
+        <ul>
+          {entry.data.relations.map((relation) => {
+            const target = bySlug.get(relation.target);
+            return (
+              <li>
+                {RELATION_LABELS[relation.type]}{" "}
+                {target ? <a href={entryUrl(target)}>{target.data.title}</a> : relation.target}
+                {relation.conditions && <span class="relation-conditions">, when {relation.conditions}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )}
   </article>
 
   <section class="entry-map" aria-labelledby="entry-map-heading">
@@ -78,6 +111,11 @@ const descendants = graph.descendants(entry.data.slug);
   .entry-map-heading h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.02em; }
   .map-summary { flex: none; margin: 0 0 0.15rem; color: var(--muted); font-family: var(--font-mono); font-size: 0.68rem; }
   .entry-edit { margin-top: 1.5rem; color: var(--muted); font-size: 0.75rem; }
+  .entry-roles { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.75rem; }
+  .entry-relations { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .entry-relations h2 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+  .entry-relations ul { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; }
+  .relation-conditions { color: var(--muted); }
   .entry-edit a { margin-left: 0.25rem; }
   @media (max-width: 650px) {
     .entry-map-heading { align-items: flex-start; flex-direction: column; gap: 0.5rem; }

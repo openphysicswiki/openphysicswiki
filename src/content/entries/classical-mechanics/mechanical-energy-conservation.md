@@ -1,11 +1,10 @@
 ---
 title: "Conservation of mechanical energy"
 slug: mechanical-energy-conservation
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [work-energy-theorem, potential-energy]
 summary: "Mechanical energy T+U is constant when the total force is conservative and its potential is time independent."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [work-energy-theorem, potential-energy] }
 ---
 ## Statement
 If the total force is conservative, $\mathbf F=-\nabla U$, then the mechanical energy

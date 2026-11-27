@@ -1,11 +1,10 @@
 ---
 title: "Conservative force"
 slug: conservative-force
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [work]
 summary: "A conservative force does path-independent work between any two points in its domain."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [work] }
 ---
 ## Statement
 A force field $\mathbf F(\mathbf r)$ is conservative if, for every pair of points, its work is independent of the path joining them. Equivalently,

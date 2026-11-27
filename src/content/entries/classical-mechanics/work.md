@@ -1,11 +1,10 @@
 ---
 title: "Work"
 slug: work
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [newtons-second-law, kinematics]
 summary: "Work is the line integral of force along a particle's trajectory."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [newtons-second-law, kinematics] }
 ---
 ## Statement
 The work done by a force $\mathbf F$ on a point particle along trajectory $C$ from $\mathbf r_1$ to $\mathbf r_2$ is

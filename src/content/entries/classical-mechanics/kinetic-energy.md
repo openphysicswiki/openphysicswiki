@@ -1,11 +1,10 @@
 ---
 title: "Kinetic energy"
 slug: kinetic-energy
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [kinematics]
 summary: "Kinetic energy is one half of a particle's mass times the square of its speed."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [kinematics] }
 ---
 ## Statement
 The kinetic energy of a point particle of mass $m$ moving with velocity $\mathbf v$ is

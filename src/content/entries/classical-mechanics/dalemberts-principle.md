@@ -1,11 +1,10 @@
 ---
 title: "d'Alembert's principle"
 slug: dalemberts-principle
-type: principle
 field: classical-mechanics
-foundational: false
-dependencies: [newtons-second-law, generalized-coordinates]
 summary: "For ideal constraints, applied forces minus inertial forces have zero total virtual work."
+roles:
+  newtonian: { type: principle, foundational: false, dependencies: [newtons-second-law, generalized-coordinates] }
 ---
 ## Statement
 For $N$ particles, let $\mathbf F_i^{(a)}$ be the applied force on particle $i$, excluding its constraint force $\mathbf R_i$. For every fixed-time virtual displacement compatible with the constraints,

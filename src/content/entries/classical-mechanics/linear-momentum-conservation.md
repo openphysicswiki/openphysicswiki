@@ -1,11 +1,10 @@
 ---
 title: "Conservation of linear momentum"
 slug: linear-momentum-conservation
-type: theorem
 field: classical-mechanics
-foundational: false
-dependencies: [newtons-second-law, newtons-third-law, linear-momentum]
 summary: "The total linear momentum of an isolated system of point particles is constant in an inertial frame."
+roles:
+  newtonian: { type: theorem, foundational: false, dependencies: [newtons-second-law, newtons-third-law, linear-momentum] }
 ---
 ## Statement
 For $N$ point particles with total linear momentum

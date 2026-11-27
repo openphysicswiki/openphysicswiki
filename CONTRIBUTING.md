@@ -7,8 +7,8 @@ Small, focused patches are preferred: one correction, one clarified assumption, 
 1. Write one result per file: a definition, axiom, principle, theorem, or technique.
 2. State all assumptions and include a concise derivation where relevant.
 3. Write from scratch. Never copy textbook or online prose, derivations, or problems. Sources may be used only to cross-check results.
-4. Link direct prerequisites in `dependencies`. Never maintain or generate a graph by hand.
-5. Mark foundational definitions and axioms with `foundational: true`.
+4. Give the entry a role for each framework it belongs to (`roles.newtonian`, …), and link direct prerequisites in that role's `dependencies`. Never maintain or generate a graph by hand.
+5. Mark foundational definitions and axioms with `foundational: true` in their role.
 6. Preserve global slug uniqueness and keep the filename, field directory, and frontmatter in agreement.
 
 See the entry example and schema documentation in [README.md](README.md).

@@ -1,11 +1,10 @@
 ---
 title: "Potential energy"
 slug: potential-energy
-type: definition
 field: classical-mechanics
-foundational: true
-dependencies: [conservative-force]
 summary: "Potential energy changes by minus the work done by its conservative force and is fixed up to an additive constant."
+roles:
+  newtonian: { type: definition, foundational: true, dependencies: [conservative-force] }
 ---
 ## Statement
 A scalar potential energy $U$ associated with a conservative force $\mathbf F_C$ is defined by
